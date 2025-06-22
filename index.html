@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Today's Leads - Krishna Anandam</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+
+    thead {
+      background: #2c3e50;
+      color: white;
+    }
+
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    @media (max-width: 600px) {
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Today's Leads – Krishna Anandam</h2>
+  <div class="table-wrapper">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Client Name</th>
+          <th>Contact</th>
+          <th>About</th>
+          <th>Note</th>
+          <th>Lead From</th>
+          <th>Site</th>
+          <th>Meeting Date</th>
+          <th>Meeting Time</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="9">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxjvnfY7aSLeDRI74hxE_OYPbI_U-LoiG1QOJxiAl02OFfrPbfieJd7xVtkjv4-imRB/exec';
+
+    function getTodayString() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      return `${dd}-${mm}-${yyyy}`;
+    }
+
+    function filterTodayAndSite(data) {
+      const today = getTodayString();
+      const headers = data[0];
+      const rows = data.slice(1);
+
+      const filtered = rows.filter(row => {
+        const timestamp = row[0]; // Timestamp
+        const site = row[6]; // Site column
+        return timestamp.startsWith(today) && site.trim() === "Krishna Anandam";
+      });
+
+      return filtered;
+    }
+
+    function renderTable(rows) {
+      const tbody = document.getElementById('tableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9">No entries for today.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(row => `
+        <tr>
+          ${row.map(cell => `<td>${cell || ''}</td>`).join('')}
+        </tr>
+      `).join('');
+    }
+
+    fetch(scriptURL)
+      .then(res => res.json())
+      .then(data => {
+        const rows = filterTodayAndSite(data.values);
+        renderTable(rows);
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('tableBody').innerHTML =
+          '<tr><td colspan="9">Failed to load data</td></tr>';
+      });
+  </script>
+</body>
+</html>
