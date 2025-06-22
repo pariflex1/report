@@ -8,11 +8,7 @@
   <meta property="og:title" content="Krishna Anandam Facebook Ads Leads" />
   <meta property="og:description" content="Baratha, Jhansi" />
   <meta property="og:image" content="https://github.com/pariflex1/report/blob/gh-pages/og.webp?raw=true" />
-
-
-  
- 
-  <style>
+<style>
     body {
       font-family: sans-serif;
       margin: 0;
@@ -22,7 +18,14 @@
 
     h2 {
       text-align: center;
+      margin-bottom: 5px;
+    }
+
+    #reportDate {
+      text-align: center;
+      font-weight: 500;
       margin-bottom: 20px;
+      color: #555;
     }
 
     .table-wrapper {
@@ -42,6 +45,9 @@
     thead {
       background: #2c3e50;
       color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
     th, td {
@@ -55,15 +61,23 @@
       background-color: #f1f1f1;
     }
 
+    canvas {
+      max-width: 600px;
+      margin: 30px auto;
+      display: block;
+    }
+
     @media (max-width: 600px) {
-      table {
-        font-size: 14px;
-      }
+      table { font-size: 14px; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
   <h2>Today's Leads – Krishna Anandam</h2>
+  <p id="reportDate"></p>
+
   <div class="table-wrapper">
     <table id="dataTable">
       <thead>
@@ -85,6 +99,8 @@
     </table>
   </div>
 
+  <canvas id="leadChart" height="200"></canvas>
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjvnfY7aSLeDRI74hxE_OYPbI_U-LoiG1QOJxiAl02OFfrPbfieJd7xVtkjv4-imRB/exec';
 
@@ -96,18 +112,21 @@
       return `${dd}-${mm}-${yyyy}`;
     }
 
+    function displayCurrentDate() {
+      const now = new Date();
+      const options = { day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'short' };
+      const formatted = now.toLocaleDateString('en-GB', options);
+      document.getElementById('reportDate').textContent = `Report Date: ${formatted}`;
+    }
+
     function filterTodayAndSite(data) {
       const today = getTodayString();
-      const headers = data[0];
       const rows = data.slice(1);
-
-      const filtered = rows.filter(row => {
-        const timestamp = row[0]; // Timestamp
-        const site = row[6]; // Site column
-        return timestamp.startsWith(today) && site.trim() === "Krishna Anandam";
+      return rows.filter(row => {
+        const timestamp = row[0];
+        const site = row[6];
+        return timestamp && timestamp.startsWith(today) && site.trim() === "Krishna Anandam";
       });
-
-      return filtered;
     }
 
     function renderTable(rows) {
@@ -118,17 +137,51 @@
       }
 
       tbody.innerHTML = rows.map(row => `
-        <tr>
-          ${row.map(cell => `<td>${cell || ''}</td>`).join('')}
-        </tr>
+        <tr>${row.map(cell => `<td>${cell || ''}</td>`).join('')}</tr>
       `).join('');
     }
+
+    function renderLeadSourceChart(rows) {
+      const leadSourceIndex = 5; // Lead From
+      const counts = {};
+      rows.forEach(row => {
+        const source = row[leadSourceIndex] || 'Unknown';
+        counts[source] = (counts[source] || 0) + 1;
+      });
+
+      const ctx = document.getElementById('leadChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(counts),
+          datasets: [{
+            label: 'Leads by Source',
+            data: Object.values(counts),
+            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Today\'s Leads by Source' }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    displayCurrentDate();
 
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
         const rows = filterTodayAndSite(data.values);
         renderTable(rows);
+        renderLeadSourceChart(rows);
       })
       .catch(err => {
         console.error(err);
@@ -136,5 +189,6 @@
           '<tr><td colspan="9">Failed to load data</td></tr>';
       });
   </script>
+
 </body>
 </html>
