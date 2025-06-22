@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Leads - Krishna Anandam</title>
+  <meta name="description" content="Krishna Anandam Facebook Ads Leads" />
+  <meta property="og:title" content="Contact Details of Krishna Anandam Facebook Ads Leads" />
+  <meta property="og:description" content="Facebook Ads Leads" />
+  <meta property="og:image" content="https://github.com/pariflex1/report/blob/gh-pages/og.webp?raw=true" />
   <style>
     body { font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; }
     h2 { text-align: center; margin-bottom: 5px; }
@@ -191,21 +195,32 @@
   }
 
   function fetchAndRender() {
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-    fetch(scriptURL)
-      .then(res => res.json())
-      .then(data => {
-        const rows = filterByDateAndSite(data.values, fromDate, toDate);
-        renderTable(rows);
-        renderCategoryCounts(rows);
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">Failed to load data</td></tr>';
-        document.getElementById('categoryList').innerHTML = '<li>Failed to load categories</li>';
+  const fromDate = document.getElementById('fromDate').value;
+  const toDate = document.getElementById('toDate').value;
+  fetch(scriptURL)
+    .then(res => res.json())
+    .then(data => {
+      let rows = filterByDateAndSite(data.values, fromDate, toDate);
+      
+      // Sort by timestamp descending (Z to A)
+      rows.sort((a, b) => {
+        const [dayA, monthA, yearA, timeA] = [...a[0].split(' ')[0].split('-'), a[0].split(' ')[1]];
+        const [dayB, monthB, yearB, timeB] = [...b[0].split(' ')[0].split('-'), b[0].split(' ')[1]];
+        const dateA = new Date(`${yearA}-${monthA}-${dayA}T${timeA}`);
+        const dateB = new Date(`${yearB}-${monthB}-${dayB}T${timeB}`);
+        return dateB - dateA; // Descending
       });
-  }
+
+      renderTable(rows);
+      renderCategoryCounts(rows);
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">Failed to load data</td></tr>';
+      document.getElementById('categoryList').innerHTML = '<li>Failed to load categories</li>';
+    });
+}
+
 
   displayCurrentDate();
 
