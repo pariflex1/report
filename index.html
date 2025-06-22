@@ -61,17 +61,34 @@
       background-color: #f1f1f1;
     }
 
-    canvas {
+    .category-counts {
       max-width: 600px;
       margin: 30px auto;
-      display: block;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.05);
+    }
+
+    .category-counts h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .category-counts ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .category-counts li {
+      padding: 4px 0;
+      font-size: 15px;
     }
 
     @media (max-width: 600px) {
       table { font-size: 14px; }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -99,7 +116,12 @@
     </table>
   </div>
 
-  <canvas id="leadChart" height="200"></canvas>
+  <div class="category-counts" id="categoryCounts">
+    <h3>Today's Lead Categories</h3>
+    <ul id="categoryList">
+      <li>Loading categories...</li>
+    </ul>
+  </div>
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjvnfY7aSLeDRI74hxE_OYPbI_U-LoiG1QOJxiAl02OFfrPbfieJd7xVtkjv4-imRB/exec';
@@ -125,7 +147,7 @@
       return rows.filter(row => {
         const timestamp = row[0];
         const site = row[6];
-        return timestamp && timestamp.startsWith(today) && site.trim() === "Krishna Anandam";
+        return timestamp && timestamp.startsWith(today) && site.trim().toLowerCase() === "krishna anandam";
       });
     }
 
@@ -135,43 +157,28 @@
         tbody.innerHTML = '<tr><td colspan="9">No entries for today.</td></tr>';
         return;
       }
-
       tbody.innerHTML = rows.map(row => `
         <tr>${row.map(cell => `<td>${cell || ''}</td>`).join('')}</tr>
       `).join('');
     }
 
-    function renderLeadSourceChart(rows) {
-      const leadSourceIndex = 5; // Lead From
+    function renderCategoryCounts(rows) {
+      const aboutIndex = 3;
+      const categories = ['city', 'job', 'plots', 'villa', 'investment', 'live in', 'details'];
       const counts = {};
+      categories.forEach(cat => counts[cat] = 0);
       rows.forEach(row => {
-        const source = row[leadSourceIndex] || 'Unknown';
-        counts[source] = (counts[source] || 0) + 1;
+        const aboutText = (row[aboutIndex] || '').toLowerCase();
+        categories.forEach(cat => {
+          if (aboutText.includes(cat)) counts[cat]++;
+        });
       });
 
-      const ctx = document.getElementById('leadChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(counts),
-          datasets: [{
-            label: 'Leads by Source',
-            data: Object.values(counts),
-            backgroundColor: 'rgba(54, 162, 235, 0.7)',
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            title: { display: true, text: 'Today\'s Leads by Source' }
-          },
-          scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1 } }
-          }
-        }
-      });
+      const list = document.getElementById('categoryList');
+      list.innerHTML = categories.map(cat => {
+        const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+        return `<li>${label}: ${counts[cat]}</li>`;
+      }).join('');
     }
 
     displayCurrentDate();
@@ -181,14 +188,15 @@
       .then(data => {
         const rows = filterTodayAndSite(data.values);
         renderTable(rows);
-        renderLeadSourceChart(rows);
+        renderCategoryCounts(rows);
       })
       .catch(err => {
         console.error(err);
         document.getElementById('tableBody').innerHTML =
           '<tr><td colspan="9">Failed to load data</td></tr>';
+        document.getElementById('categoryList').innerHTML =
+          '<li>Failed to load categories</li>';
       });
   </script>
-
 </body>
 </html>
