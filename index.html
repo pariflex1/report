@@ -8,7 +8,7 @@
   <meta property="og:title" content="Details of Facebook Ads Leads" />
   <meta property="og:description" content="Facebook Ads Leads" />
   <meta property="og:image" content="https://github.com/pariflex1/report/blob/gh-pages/og.webp?raw=true" />
-  <style>
+   <style>
     body { font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; }
     h2 { text-align: center; margin-bottom: 5px; }
     #reportDate { text-align: center; font-weight: 500; margin-bottom: 10px; color: #555; }
@@ -18,17 +18,8 @@
       margin-bottom: 20px;
     }
     .filter input {
-      margin: 0 5px;
       padding: 6px;
       font-size: 15px;
-    }
-    .filter button {
-      padding: 6px 12px;
-      font-size: 15px;
-      background: #2c3e50;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
     }
 
     .table-wrapper {
@@ -79,6 +70,7 @@
     .category-counts li {
       padding: 4px 0;
       font-size: 15px;
+      text-align: center;
     }
 
     @media (max-width: 600px) {
@@ -92,11 +84,8 @@
 <p id="reportDate"></p>
 
 <div class="filter">
-  <label for="fromDate">From:</label>
-  <input type="date" id="fromDate">
-  <label for="toDate">To:</label>
-  <input type="date" id="toDate">
-  <button onclick="fetchAndRender()">Filter</button>
+  <label for="filterDate">Select Date:</label>
+  <input type="date" id="filterDate" max="">
 </div>
 
 <div class="table-wrapper">
@@ -121,9 +110,9 @@
 </div>
 
 <div class="category-counts" id="categoryCounts">
-  <h3>Lead Categories</h3>
+  <h3>Lead Summary</h3>
   <ul id="categoryList">
-    <li>Loading categories...</li>
+    <li>Loading summary...</li>
   </ul>
 </div>
 
@@ -132,7 +121,7 @@
 
   function today() {
     const now = new Date();
-    return now.toISOString().split("T")[0]; // format: yyyy-mm-dd
+    return now.toISOString().split("T")[0];
   }
 
   function displayCurrentDate() {
@@ -150,25 +139,18 @@
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  function isInRange(dateStr, from, to) {
-    const [dd, mm, yyyy] = dateStr.split(' ')[0].split('-');
-    const d = new Date(`${yyyy}-${mm}-${dd}`);
-    return d >= new Date(from) && d <= new Date(to);
-  }
-
-  function filterByDateAndSite(data, from, to) {
-    const rows = data.slice(1); // skip header
-    return rows.filter(row => {
-      const timestamp = row[0];
-      const site = row[6];
-      return timestamp && site.trim().toLowerCase() === "krishna anandam" && isInRange(timestamp, from, to);
-    });
+  function filterByDateAndSite(data, selectedDate) {
+    const formatted = formatDate(selectedDate);
+    const rows = data.slice(1);
+    return rows.filter(row =>
+      row[0]?.startsWith(formatted) && row[6]?.toLowerCase().trim() === "krishna anandam"
+    );
   }
 
   function renderTable(rows) {
     const tbody = document.getElementById('tableBody');
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9">No entries found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9">No entries for selected date.</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(row => `
@@ -178,56 +160,67 @@
 
   function renderCategoryCounts(rows) {
     const aboutIndex = 3;
-    const categories = ['city', 'job', 'plots', 'villa', 'investment', 'live in', 'details'];
-    const counts = {};
-    categories.forEach(cat => counts[cat] = 0);
+    let villaCount = 0;
+    let plotsCount = 0;
+    let investmentCount = 0;
+    let liveInCount = 0;
+    let detailsCount = 0;
+
     rows.forEach(row => {
       const about = (row[aboutIndex] || '').toLowerCase();
-      categories.forEach(cat => {
-        if (about.includes(cat)) counts[cat]++;
-      });
+      if (about.includes('villa')) villaCount++;
+      if (about.includes('plots')) plotsCount++;
+      if (about.includes('investment')) investmentCount++;
+      if (about.includes('live in')) liveInCount++;
+      if (about.includes('details')) detailsCount++;
     });
 
     const list = document.getElementById('categoryList');
-    list.innerHTML = categories.map(cat => 
-      `<li>${cat.charAt(0).toUpperCase() + cat.slice(1)}: ${counts[cat]}</li>`
-    ).join('');
+    list.innerHTML = `
+      <li><strong>Total Leads:</strong> ${rows.length}</li>
+      <li><strong>Interest</strong></li>
+      <li>Villa: ${villaCount}</li>
+      <li>Plots: ${plotsCount}</li>
+      <li><strong>Purpose</strong></li>
+      <li>Investment: ${investmentCount}</li>
+      <li>Live In: ${liveInCount}</li>
+      <li>Details: ${detailsCount}</li>
+    `;
   }
 
   function fetchAndRender() {
-  const fromDate = document.getElementById('fromDate').value;
-  const toDate = document.getElementById('toDate').value;
-  fetch(scriptURL)
-    .then(res => res.json())
-    .then(data => {
-      let rows = filterByDateAndSite(data.values, fromDate, toDate);
-      
-      // Sort by timestamp descending (Z to A)
-      rows.sort((a, b) => {
-        const [dayA, monthA, yearA, timeA] = [...a[0].split(' ')[0].split('-'), a[0].split(' ')[1]];
-        const [dayB, monthB, yearB, timeB] = [...b[0].split(' ')[0].split('-'), b[0].split(' ')[1]];
-        const dateA = new Date(`${yearA}-${monthA}-${dayA}T${timeA}`);
-        const dateB = new Date(`${yearB}-${monthB}-${dayB}T${timeB}`);
-        return dateB - dateA; // Descending
+    const selectedDate = document.getElementById('filterDate').value;
+    fetch(scriptURL)
+      .then(res => res.json())
+      .then(data => {
+        let rows = filterByDateAndSite(data.values, selectedDate);
+
+        // Z to A sort
+        rows.sort((a, b) => {
+          const getDate = str => {
+            const [d, m, y] = str.split(' ')[0].split('-');
+            return new Date(`${y}-${m}-${d}T${str.split(' ')[1]}`);
+          };
+          return getDate(b[0]) - getDate(a[0]);
+        });
+
+        renderTable(rows);
+        renderCategoryCounts(rows);
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">Failed to load data</td></tr>';
+        document.getElementById('categoryList').innerHTML = '<li>Failed to load summary</li>';
       });
-
-      renderTable(rows);
-      renderCategoryCounts(rows);
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">Failed to load data</td></tr>';
-      document.getElementById('categoryList').innerHTML = '<li>Failed to load categories</li>';
-    });
-}
-
+  }
 
   displayCurrentDate();
 
-  // Set default date range to today
+  const filterInput = document.getElementById("filterDate");
   const todayDate = today();
-  document.getElementById("fromDate").value = todayDate;
-  document.getElementById("toDate").value = todayDate;
+  filterInput.value = todayDate;
+  filterInput.max = todayDate;
+  filterInput.addEventListener("change", fetchAndRender);
 
   fetchAndRender();
 </script>
