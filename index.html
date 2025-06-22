@@ -3,29 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Today's Leads - Krishna Anandam</title>
-  <meta name="description" content="Krishna Anandam Facebook Ads Leads" />
-  <meta property="og:title" content="Krishna Anandam Facebook Ads Leads" />
-  <meta property="og:description" content="Baratha, Jhansi" />
-  <meta property="og:image" content="https://github.com/pariflex1/report/blob/gh-pages/og.webp?raw=true" />
-<style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 10px;
-      background: #f9f9f9;
-    }
+  <title>Leads - Krishna Anandam</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; }
+    h2 { text-align: center; margin-bottom: 5px; }
+    #reportDate { text-align: center; font-weight: 500; margin-bottom: 10px; color: #555; }
 
-    h2 {
+    .filter {
       text-align: center;
-      margin-bottom: 5px;
-    }
-
-    #reportDate {
-      text-align: center;
-      font-weight: 500;
       margin-bottom: 20px;
-      color: #555;
+    }
+    .filter input {
+      margin: 0 5px;
+      padding: 6px;
+      font-size: 15px;
+    }
+    .filter button {
+      padding: 6px 12px;
+      font-size: 15px;
+      background: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
     }
 
     .table-wrapper {
@@ -35,13 +34,11 @@
       padding: 10px;
       box-shadow: 0 0 6px rgba(0,0,0,0.1);
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       min-width: 800px;
     }
-
     thead {
       background: #2c3e50;
       color: white;
@@ -49,14 +46,12 @@
       top: 0;
       z-index: 2;
     }
-
     th, td {
       padding: 8px 12px;
       border: 1px solid #ddd;
       text-align: left;
       white-space: nowrap;
     }
-
     tr:hover {
       background-color: #f1f1f1;
     }
@@ -69,17 +64,14 @@
       border-radius: 8px;
       box-shadow: 0 0 6px rgba(0,0,0,0.05);
     }
-
     .category-counts h3 {
       text-align: center;
       margin-bottom: 10px;
     }
-
     .category-counts ul {
       list-style: none;
       padding: 0;
     }
-
     .category-counts li {
       padding: 4px 0;
       font-size: 15px;
@@ -92,111 +84,138 @@
 </head>
 <body>
 
-  <h2>Today's Leads – Krishna Anandam</h2>
-  <p id="reportDate"></p>
+<h2>Leads – Krishna Anandam</h2>
+<p id="reportDate"></p>
 
-  <div class="table-wrapper">
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th>Timestamp</th>
-          <th>Client Name</th>
-          <th>Contact</th>
-          <th>About</th>
-          <th>Note</th>
-          <th>Lead From</th>
-          <th>Site</th>
-          <th>Meeting Date</th>
-          <th>Meeting Time</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr><td colspan="9">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div class="filter">
+  <label for="fromDate">From:</label>
+  <input type="date" id="fromDate">
+  <label for="toDate">To:</label>
+  <input type="date" id="toDate">
+  <button onclick="fetchAndRender()">Filter</button>
+</div>
 
-  <div class="category-counts" id="categoryCounts">
-    <h3>Today's Lead Categories</h3>
-    <ul id="categoryList">
-      <li>Loading categories...</li>
-    </ul>
-  </div>
+<div class="table-wrapper">
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Client Name</th>
+        <th>Contact</th>
+        <th>About</th>
+        <th>Note</th>
+        <th>Lead From</th>
+        <th>Site</th>
+        <th>Meeting Date</th>
+        <th>Meeting Time</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="9">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxjvnfY7aSLeDRI74hxE_OYPbI_U-LoiG1QOJxiAl02OFfrPbfieJd7xVtkjv4-imRB/exec';
+<div class="category-counts" id="categoryCounts">
+  <h3>Lead Categories</h3>
+  <ul id="categoryList">
+    <li>Loading categories...</li>
+  </ul>
+</div>
 
-    function getTodayString() {
-      const now = new Date();
-      const dd = String(now.getDate()).padStart(2, '0');
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const yyyy = now.getFullYear();
-      return `${dd}-${mm}-${yyyy}`;
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxjvnfY7aSLeDRI74hxE_OYPbI_U-LoiG1QOJxiAl02OFfrPbfieJd7xVtkjv4-imRB/exec';
+
+  function today() {
+    const now = new Date();
+    return now.toISOString().split("T")[0]; // format: yyyy-mm-dd
+  }
+
+  function displayCurrentDate() {
+    const now = new Date();
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'short' };
+    document.getElementById('reportDate').textContent =
+      `Report Generated On: ${now.toLocaleDateString('en-GB', options)}`;
+  }
+
+  function formatDate(d) {
+    const date = new Date(d);
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
+  function isInRange(dateStr, from, to) {
+    const [dd, mm, yyyy] = dateStr.split(' ')[0].split('-');
+    const d = new Date(`${yyyy}-${mm}-${dd}`);
+    return d >= new Date(from) && d <= new Date(to);
+  }
+
+  function filterByDateAndSite(data, from, to) {
+    const rows = data.slice(1); // skip header
+    return rows.filter(row => {
+      const timestamp = row[0];
+      const site = row[6];
+      return timestamp && site.trim().toLowerCase() === "krishna anandam" && isInRange(timestamp, from, to);
+    });
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('tableBody');
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9">No entries found.</td></tr>';
+      return;
     }
+    tbody.innerHTML = rows.map(row => `
+      <tr>${row.map(cell => `<td>${cell || ''}</td>`).join('')}</tr>
+    `).join('');
+  }
 
-    function displayCurrentDate() {
-      const now = new Date();
-      const options = { day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'short' };
-      const formatted = now.toLocaleDateString('en-GB', options);
-      document.getElementById('reportDate').textContent = `Report Date: ${formatted}`;
-    }
-
-    function filterTodayAndSite(data) {
-      const today = getTodayString();
-      const rows = data.slice(1);
-      return rows.filter(row => {
-        const timestamp = row[0];
-        const site = row[6];
-        return timestamp && timestamp.startsWith(today) && site.trim().toLowerCase() === "krishna anandam";
+  function renderCategoryCounts(rows) {
+    const aboutIndex = 3;
+    const categories = ['city', 'job', 'plots', 'villa', 'investment', 'live in', 'details'];
+    const counts = {};
+    categories.forEach(cat => counts[cat] = 0);
+    rows.forEach(row => {
+      const about = (row[aboutIndex] || '').toLowerCase();
+      categories.forEach(cat => {
+        if (about.includes(cat)) counts[cat]++;
       });
-    }
+    });
 
-    function renderTable(rows) {
-      const tbody = document.getElementById('tableBody');
-      if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9">No entries for today.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = rows.map(row => `
-        <tr>${row.map(cell => `<td>${cell || ''}</td>`).join('')}</tr>
-      `).join('');
-    }
+    const list = document.getElementById('categoryList');
+    list.innerHTML = categories.map(cat => 
+      `<li>${cat.charAt(0).toUpperCase() + cat.slice(1)}: ${counts[cat]}</li>`
+    ).join('');
+  }
 
-    function renderCategoryCounts(rows) {
-      const aboutIndex = 3;
-      const categories = ['city', 'job', 'plots', 'villa', 'investment', 'live in', 'details'];
-      const counts = {};
-      categories.forEach(cat => counts[cat] = 0);
-      rows.forEach(row => {
-        const aboutText = (row[aboutIndex] || '').toLowerCase();
-        categories.forEach(cat => {
-          if (aboutText.includes(cat)) counts[cat]++;
-        });
-      });
-
-      const list = document.getElementById('categoryList');
-      list.innerHTML = categories.map(cat => {
-        const label = cat.charAt(0).toUpperCase() + cat.slice(1);
-        return `<li>${label}: ${counts[cat]}</li>`;
-      }).join('');
-    }
-
-    displayCurrentDate();
-
+  function fetchAndRender() {
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
-        const rows = filterTodayAndSite(data.values);
+        const rows = filterByDateAndSite(data.values, fromDate, toDate);
         renderTable(rows);
         renderCategoryCounts(rows);
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('tableBody').innerHTML =
-          '<tr><td colspan="9">Failed to load data</td></tr>';
-        document.getElementById('categoryList').innerHTML =
-          '<li>Failed to load categories</li>';
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="9">Failed to load data</td></tr>';
+        document.getElementById('categoryList').innerHTML = '<li>Failed to load categories</li>';
       });
-  </script>
+  }
+
+  displayCurrentDate();
+
+  // Set default date range to today
+  const todayDate = today();
+  document.getElementById("fromDate").value = todayDate;
+  document.getElementById("toDate").value = todayDate;
+
+  fetchAndRender();
+</script>
+
 </body>
 </html>
