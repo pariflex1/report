@@ -8,7 +8,7 @@
   <meta property="og:title" content="Details of Facebook Ads Leads" />
   <meta property="og:description" content="Facebook Ads Leads" />
   <meta property="og:image" content="https://github.com/pariflex1/report/blob/gh-pages/og.webp?raw=true" />
-   <style>
+  <style>
     body { font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; }
     h2 { text-align: center; margin-bottom: 5px; }
     #reportDate { text-align: center; font-weight: 500; margin-bottom: 10px; color: #555; }
@@ -20,6 +20,7 @@
     .filter input {
       padding: 6px;
       font-size: 15px;
+      margin: 0 5px;
     }
 
     .table-wrapper {
@@ -84,8 +85,11 @@
 <p id="reportDate"></p>
 
 <div class="filter">
-  <label for="filterDate">Select Date:</label>
-  <input type="date" id="filterDate" max="">
+  <label for="fromDate">From:</label>
+  <input type="date" id="fromDate" max="">
+
+  <label for="toDate">To:</label>
+  <input type="date" id="toDate" max="">
 </div>
 
 <div class="table-wrapper">
@@ -139,18 +143,29 @@
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  function filterByDateAndSite(data, selectedDate) {
-    const formatted = formatDate(selectedDate);
-    const rows = data.slice(1);
-    return rows.filter(row =>
-      row[0]?.startsWith(formatted) && row[6]?.toLowerCase().trim() === "krishna anandam"
-    );
+  function filterByDateAndSite(data, fromDateStr, toDateStr) {
+    const from = new Date(fromDateStr);
+    const to = new Date(toDateStr);
+    to.setHours(23, 59, 59, 999); // Include full end date
+
+    const rows = data.slice(1); // skip header
+    return rows.filter(row => {
+      const timestamp = row[0];
+      const site = row[6]?.toLowerCase().trim();
+      if (!timestamp || site !== "krishna anandam") return false;
+
+      const [d, m, y] = timestamp.split(' ')[0].split('-');
+      const timePart = timestamp.split(' ')[1] || '00:00';
+      const dateObj = new Date(`${y}-${m}-${d}T${timePart}`);
+
+      return dateObj >= from && dateObj <= to;
+    });
   }
 
   function renderTable(rows) {
     const tbody = document.getElementById('tableBody');
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9">No entries for selected date.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9">No entries for selected date range.</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(row => `
@@ -189,13 +204,16 @@
   }
 
   function fetchAndRender() {
-    const selectedDate = document.getElementById('filterDate').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+    if (!fromDate || !toDate) return;
+
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
-        let rows = filterByDateAndSite(data.values, selectedDate);
+        let rows = filterByDateAndSite(data.values, fromDate, toDate);
 
-        // Z to A sort
+        // Sort newest to oldest
         rows.sort((a, b) => {
           const getDate = str => {
             const [d, m, y] = str.split(' ')[0].split('-');
@@ -216,11 +234,16 @@
 
   displayCurrentDate();
 
-  const filterInput = document.getElementById("filterDate");
+  const fromInput = document.getElementById("fromDate");
+  const toInput = document.getElementById("toDate");
   const todayDate = today();
-  filterInput.value = todayDate;
-  filterInput.max = todayDate;
-  filterInput.addEventListener("change", fetchAndRender);
+  fromInput.value = todayDate;
+  toInput.value = todayDate;
+  fromInput.max = todayDate;
+  toInput.max = todayDate;
+
+  fromInput.addEventListener("change", fetchAndRender);
+  toInput.addEventListener("change", fetchAndRender);
 
   fetchAndRender();
 </script>
