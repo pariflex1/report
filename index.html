@@ -34,6 +34,7 @@
       width: 100%;
       border-collapse: collapse;
       min-width: 600px; /* Adjusted min-width for fewer columns */
+      table-layout: auto; /* Default for responsiveness */
     }
     thead {
       background: #2c3e50;
@@ -43,24 +44,25 @@
       z-index: 2;
     }
     th, td {
-      padding: 8px 12px;
+      padding: 8px 8px; /* Slightly reduced padding */
       border: 1px solid #ddd;
       text-align: left;
-      white-space: nowrap;
+      white-space: nowrap; /* Keep on one line normally */
+      vertical-align: top; /* Align content to top for better look with wrapping */
     }
     tr:hover {
       background-color: #f1f1f1;
     }
 
-    .category-counts {
+    .category-counts, .selected-date-range-display {
       max-width: 600px;
-      margin: 30px auto;
+      margin: 30px auto 15px auto; /* Adjust margin for date range display */
       background: #fff;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 0 6px rgba(0,0,0,0.05);
     }
-    .category-counts h3 {
+    .category-counts h3, .selected-date-range-display p {
       text-align: center;
       margin-bottom: 10px;
     }
@@ -73,6 +75,12 @@
       font-size: 15px;
       text-align: center;
     }
+    .selected-date-range-display p {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+    }
+
 
     .print-button-container {
         text-align: center;
@@ -101,25 +109,59 @@
     @media print {
         body {
             background: none;
+            margin: 0;
+            padding: 0;
+            font-size: 10pt; /* Smaller base font for print */
         }
-        .filter, .print-button-container, #reportDate, .category-counts {
-            display: none;
+        h2 {
+            font-size: 18pt; /* Adjust heading size for print */
+        }
+        .filter, .print-button-container, #reportDate {
+            display: none; /* Hide interactive elements */
         }
         .table-wrapper {
             box-shadow: none;
             padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll in print */
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 9pt; /* Smaller font size for table cells */
+            table-layout: fixed; /* Fixed table layout to control column widths */
         }
         th, td {
             border: 1px solid #000;
-            padding: 5px;
+            padding: 3px 5px; /* More compact padding */
+            text-align: left;
+            white-space: normal; /* Allow text to wrap */
+            word-wrap: break-word; /* Ensure long words break */
         }
         thead {
             background: #eee;
             color: #000;
+        }
+        /* Define column widths for A4 print */
+        th:nth-child(1), td:nth-child(1) { width: 18%; } /* Timestamp */
+        th:nth-child(2), td:nth-child(2) { width: 18%; } /* Client Name */
+        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Contact */
+        th:nth-child(4), td:nth-child(4) { width: 20%; } /* About */
+        th:nth-child(5), td:nth-child(5) { width: 15%; } /* Note */
+        th:nth-child(6), td:nth-child(6) { width: 14%; } /* Lead From */
+
+        .category-counts, .selected-date-range-display {
+            display: block; /* Ensure summary and date range are printed */
+            margin: 15px auto; /* Adjust margin for print */
+            box-shadow: none;
+            border: 1px solid #ddd; /* Add a subtle border for separation */
+            page-break-inside: avoid; /* Prevent breaking summary across pages */
+        }
+        .category-counts h3, .selected-date-range-display p {
+            font-size: 12pt; /* Adjust font size for print */
+            margin-bottom: 5px;
+        }
+        .category-counts ul {
+            font-size: 10pt;
         }
     }
   </style>
@@ -149,8 +191,13 @@
       </tr>
     </thead>
     <tbody id="tableBody">
-      <tr><td colspan="6">Loading...</td></tr> </tbody>
+      <tr><td colspan="6">Loading...</td></tr>
+    </tbody>
   </table>
+</div>
+
+<div class="selected-date-range-display">
+    <p id="selectedDateRange"></p>
 </div>
 
 <div class="category-counts" id="categoryCounts">
@@ -159,6 +206,7 @@
     <li>Loading summary...</li>
   </ul>
 </div>
+
 
 <div class="print-button-container">
     <button class="print-button" onclick="window.print()">Print Report</button>
@@ -188,7 +236,7 @@
     const parts = dateTimeString.split(' ');
     if (parts.length !== 2) return null; // Expects "date time"
 
-    const datePart = parts[0]; // e.g., "06/07/2025"
+    const datePart = parts[0]; // e.g., "06-07-2025"
     const timePart = parts[1]; // e.g., "11:26:05"
 
     const [day, month, year] = datePart.split('-').map(Number);
@@ -223,12 +271,10 @@
   function renderTable(rows) {
     const tbody = document.getElementById('tableBody');
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6">No entries for the selected date range.</td></tr>'; // Adjusted colspan
+      tbody.innerHTML = '<tr><td colspan="6">No entries for the selected date range.</td></tr>';
       return;
     }
-    // Define which columns to display (indices in original data)
-    // Assuming original sheet columns are: [0]Timestamp, [1]Client Name, [2]Contact, [3]About, [4]Note, [5]Lead From, [6]Site, [7]Meeting Date, [8]Meeting Time
-    const columnsToDisplay = [0, 1, 2, 3, 4, 5]; // Timestamp, Client Name, Contact, About, Note, Lead From
+    const columnsToDisplay = [0, 1, 2, 3, 4, 5];
 
     tbody.innerHTML = rows.map(row => `
       <tr>
@@ -237,8 +283,8 @@
     `).join('');
   }
 
-  function renderCategoryCounts(rows) {
-    const aboutIndex = 3; // Index for 'About' column in the original data
+  function renderCategoryCounts(rows, startDate, endDate) {
+    const aboutIndex = 3;
 
     let villaCount = 0;
     let plotsCount = 0;
@@ -267,20 +313,26 @@
       <li>Live In: ${liveInCount}</li>
       <li>Details: ${detailsCount}</li>
     `;
+
+    // Display selected date range
+    const selectedDateRangeElement = document.getElementById('selectedDateRange');
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const formattedStartDate = new Date(startDate).toLocaleDateString('en-GB', options);
+    const formattedEndDate = new Date(endDate).toLocaleDateString('en-GB', options);
+    selectedDateRangeElement.textContent = `Selected Date Range: ${formattedStartDate} - ${formattedEndDate}`;
   }
 
   function fetchAndRender() {
     const startDate = document.getElementById('filterStartDate').value;
     const endDate = document.getElementById('filterEndDate').value;
 
-    // Only fetch data once to avoid repeated network requests
     if (allData.length === 0) { 
         fetch(scriptURL)
             .then(res => res.json())
             .then(data => {
-                allData = data.values; // Store all data
+                allData = data.values;
                 if (allData && allData.length > 0) {
-                    allEntriesCount = allData.length - 1; // Exclude header row for total count
+                    allEntriesCount = allData.length - 1;
                 } else {
                     allEntriesCount = 0;
                 }
@@ -288,8 +340,9 @@
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6">Failed to load data</td></tr>'; // Adjusted colspan
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6">Failed to load data</td></tr>';
                 document.getElementById('categoryList').innerHTML = '<li>Failed to load summary</li>';
+                document.getElementById('selectedDateRange').textContent = 'Selected Date Range: N/A';
             });
     } else {
         applyFiltersAndRender(startDate, endDate);
@@ -299,20 +352,18 @@
   function applyFiltersAndRender(startDate, endDate) {
     let rows = filterByDateRange(allData, startDate, endDate);
 
-    // Z to A sort by Timestamp (index 0)
     rows.sort((a, b) => {
       const dateA = parseDateTimeString(a[0]);
       const dateB = parseDateTimeString(b[0]);
 
-      // Handle invalid dates by placing them at the end or beginning
       if (!dateA || isNaN(dateA)) return 1;
       if (!dateB || isNaN(dateB)) return -1;
       
-      return dateB.getTime() - dateA.getTime(); // Sort descending
+      return dateB.getTime() - dateA.getTime();
     });
 
     renderTable(rows);
-    renderCategoryCounts(rows);
+    renderCategoryCounts(rows, startDate, endDate); // Pass dates to render function
   }
 
   displayCurrentDate();
@@ -329,7 +380,7 @@
   filterStartDateInput.addEventListener("change", fetchAndRender);
   filterEndDateInput.addEventListener("change", fetchAndRender);
 
-  fetchAndRender(); // Initial fetch and render
+  fetchAndRender();
 </script>
 
 </body>
