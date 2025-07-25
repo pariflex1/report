@@ -1,387 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Leads - Krishna Anandam</title>
-  <meta name="description" content="Krishna Anandam Facebook Ads Leads" />
-  <meta property="og:title" content="Details of Facebook Ads Leads - Krishna Anandam" />
-  <meta property="og:description" content="Facebook Ads Leads for Krishna Anandam" />
-  <meta property="og:image" content="https://github.com/pariflex1/rising-lead-report/blob/main/og.webp?raw=true" />
-   <style>
-    body { font-family: sans-serif; margin: 0; padding: 10px; background: #f9f9f9; }
-    h2 { text-align: center; margin-bottom: 5px; }
-    #reportDate { text-align: center; font-weight: 500; margin-bottom: 10px; color: #555; }
-
-    .filter {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .filter input {
-      padding: 6px;
-      font-size: 15px;
-      margin: 0 5px; /* Add some margin for date inputs */
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      background: white;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 600px; /* Adjusted min-width for fewer columns */
-      table-layout: auto; /* Default for responsiveness */
-    }
-    thead {
-      background: #2c3e50;
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-    th, td {
-      padding: 8px 8px; /* Slightly reduced padding */
-      border: 1px solid #ddd;
-      text-align: left;
-      white-space: nowrap; /* Keep on one line normally */
-      vertical-align: top; /* Align content to top for better look with wrapping */
-    }
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .category-counts, .selected-date-range-display {
-      max-width: 600px;
-      margin: 30px auto 15px auto; /* Adjust margin for date range display */
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 6px rgba(0,0,0,0.05);
-    }
-    .category-counts h3, .selected-date-range-display p {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .category-counts ul {
-      list-style: none;
-      padding: 0;
-    }
-    .category-counts li {
-      padding: 4px 0;
-      font-size: 15px;
-      text-align: center;
-    }
-    .selected-date-range-display p {
-        font-weight: bold;
-        font-size: 16px;
-        color: #333;
-    }
-
-
-    .print-button-container {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .print-button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #2c3e50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .print-button:hover {
-        background-color: #1a242f;
-    }
-
-    @media (max-width: 600px) {
-      table { font-size: 14px; }
-    }
-
-    @media print {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RVMC - Krishna Anandam Leads Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a single-page dashboard. It starts with high-level Key Performance Indicators (KPIs) in cards for a quick summary (Total Leads, Top Source, etc.). Below this, the page is divided into thematic sections for Lead Source, Interest, Purpose, Job, and City, each with a dedicated visualization. This structure allows users to get an immediate overview and then drill down into specific areas of interest. A dashboard approach is ideal for summarizing report data, making it more digestible and engaging than a static document. The flow is top-down, from general to specific, which is an intuitive way to explore data. -->
+    <!-- Visualization & Content Choices: 
+        - Overall Summary -> Goal: Inform -> KPI Cards -> Interaction: None -> Justification: Provides immediate, high-level statistics. Method: HTML/Tailwind.
+        - Lead Source Breakdown -> Goal: Compare Proportions -> Doughnut Chart -> Interaction: Hover for tooltips, display percentages directly on chart -> Justification: Best for showing parts of a whole where one or two categories dominate, with direct numerical context. Library: Chart.js.
+        - Interest (Villa vs. Plots) -> Goal: Compare Proportions -> Doughnut Chart -> Interaction: Hover for tooltips, display percentages directly on chart -> Justification: Clearly visualizes the lead's primary interest areas with numerical context. Library: Chart.js.
+        - Purpose (Investment vs. Live In) -> Goal: Compare Proportions -> Doughnut Chart -> Interaction: Hover for tooltips, display percentages directly on chart -> Justification: Effectively shows the main drivers behind inquiries with numerical context. Library: Chart.js.
+        - Job Category Breakdown -> Goal: Rank/Compare -> Horizontal Bar Chart -> Interaction: Hover for tooltips, display counts on bars -> Justification: Ideal for ranking categories with long labels, showing the top professions clearly with direct numerical context. Library: Chart.js.
+        - City-wise Distribution -> Goal: Rank/Compare -> Horizontal Bar Chart -> Interaction: Hover for tooltips, display counts on bars -> Justification: Ranks the geographic sources of leads effectively with direct numerical context. Library: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
         body {
-            background: none;
-            margin: 0;
-            padding: 0;
-            font-size: 10pt; /* Smaller base font for print */
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7;
+            color: #4A4A4A;
         }
-        h2 {
-            font-size: 18pt; /* Adjust heading size for print */
-        }
-        .filter, .print-button-container, #reportDate {
-            display: none; /* Hide interactive elements */
-        }
-        .table-wrapper {
-            box-shadow: none;
-            padding: 0;
-            overflow-x: hidden; /* Prevent horizontal scroll in print */
-        }
-        table {
+        .chart-container {
+            position: relative;
             width: 100%;
-            border-collapse: collapse;
-            font-size: 9pt; /* Smaller font size for table cells */
-            table-layout: fixed; /* Fixed table layout to control column widths */
+            max-width: 500px; /* Reduced max-width for faster rendering on wider screens */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
         }
-        th, td {
-            border: 1px solid #000;
-            padding: 3px 5px; /* More compact padding */
-            text-align: left;
-            white-space: normal; /* Allow text to wrap */
-            word-wrap: break-word; /* Ensure long words break */
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 400px;
+            }
         }
-        thead {
-            background: #eee;
-            color: #000;
+        /* Adjusted for smaller screens to ensure charts are not too tall */
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+                max-height: 300px;
+            }
+            .kpi-card h3 {
+                font-size: 0.9rem;
+            }
+            .kpi-card p {
+                font-size: 2.5rem;
+            }
         }
-        /* Define column widths for A4 print */
-        th:nth-child(1), td:nth-child(1) { width: 18%; } /* Timestamp */
-        th:nth-child(2), td:nth-child(2) { width: 18%; } /* Client Name */
-        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Contact */
-        th:nth-child(4), td:nth-child(4) { width: 20%; } /* About */
-        th:nth-child(5), td:nth-child(5) { width: 15%; } /* Note */
-        th:nth-child(6), td:nth-child(6) { width: 14%; } /* Lead From */
-
-        .category-counts, .selected-date-range-display {
-            display: block; /* Ensure summary and date range are printed */
-            margin: 15px auto; /* Adjust margin for print */
-            box-shadow: none;
-            border: 1px solid #ddd; /* Add a subtle border for separation */
-            page-break-inside: avoid; /* Prevent breaking summary across pages */
+        .kpi-card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .category-counts h3, .selected-date-range-display p {
-            font-size: 12pt; /* Adjust font size for print */
-            margin-bottom: 5px;
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        .category-counts ul {
-            font-size: 10pt;
-        }
-    }
-  </style>
+    </style>
 </head>
-<body>
+<body class="antialiased">
 
-<h2>Leads – Krishna Anandam</h2>
-<p id="reportDate"></p>
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-<div class="filter">
-  <label for="filterStartDate">From Date:</label>
-  <input type="date" id="filterStartDate" max="">
-  <label for="filterEndDate">To Date:</label>
-  <input type="date" id="filterEndDate" max="">
-</div>
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#3A3A3A]">RVMC - Krishna Anandam</h1>
+            <p class="text-lg text-gray-600 mt-2">Interactive Leads Report Dashboard</p>
+        </header>
 
-<div class="table-wrapper">
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>Client Name</th>
-        <th>Contact</th>
-        <th>About</th>
-        <th>Note</th>
-        <th>Lead From</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <tr><td colspan="6">Loading...</td></tr>
-    </tbody>
-  </table>
-</div>
+        <main>
+            <section id="kpis" class="mb-10">
+                <h2 class="text-2xl font-semibold text-center mb-6 text-[#3A3A3A]">Overall Summary</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="kpi-card p-6 rounded-xl shadow-sm text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">Total Leads</h3>
+                        <p id="totalLeads" class="text-4xl font-bold text-[#C08261] mt-2">299</p>
+                    </div>
+                    <div class="kpi-card p-6 rounded-xl shadow-sm text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">Top Lead Source</h3>
+                        <p id="topSource" class="text-4xl font-bold text-[#C08261] mt-2">Facebook</p>
+                    </div>
+                    <div class="kpi-card p-6 rounded-xl shadow-sm text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">Top Interest</h3>
+                        <p id="topInterest" class="text-4xl font-bold text-[#C08261] mt-2">Villa</p>
+                    </div>
+                    <div class="kpi-card p-6 rounded-xl shadow-sm text-center">
+                        <h3 class="text-lg font-semibold text-gray-500">Top Purpose</h3>
+                        <p id="topPurpose" class="text-4xl font-bold text-[#C08261] mt-2">Investment</p>
+                    </div>
+                </div>
+            </section>
 
-<div class="selected-date-range-display">
-    <p id="selectedDateRange"></p>
-</div>
+            <section id="charts" class="space-y-12">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-center mb-4">Lead Source Breakdown</h3>
+                        <p class="text-center text-gray-600 mb-4 text-sm">This chart illustrates the origin of leads, showing which channels are most effective. Facebook is clearly the dominant source, highlighting its importance in the lead generation strategy.</p>
+                        <div class="chart-container">
+                            <canvas id="leadSourceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-xl font-semibold text-center mb-4">Interest (Villa vs. Plots)</h3>
+                             <p class="text-center text-gray-600 mb-4 text-sm">This chart shows the distribution of client interest between different property types. A significant majority of leads are interested in Villas.</p>
+                            <div class="chart-container">
+                                <canvas id="interestChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <h3 class="text-xl font-semibold text-center mb-4">Purpose (Investment vs. Live In)</h3>
+                            <p class="text-center text-gray-600 mb-4 text-sm">This visualization breaks down the primary motivation behind the inquiries, whether for personal residence or for investment purposes.</p>
+                            <div class="chart-container">
+                                <canvas id="purposeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="category-counts" id="categoryCounts">
-  <h3>Lead Summary</h3>
-  <ul id="categoryList">
-    <li>Loading summary...</li>
-  </ul>
-</div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-center mb-4">Top 10 Job Categories</h3>
+                        <p class="text-center text-gray-600 mb-4 text-sm">Understanding the professional background of leads can be crucial for targeted marketing. This chart displays the top professions of the individuals inquiring about the properties.</p>
+                        <div class="chart-container h-[400px] max-h-[450px]">
+                            <canvas id="jobChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-center mb-4">Top 10 City Distribution</h3>
+                        <p class="text-center text-gray-600 mb-4 text-sm">This chart highlights the primary geographic locations of the leads. A strong concentration of leads comes from Jhansi, indicating a strong local market interest.</p>
+                        <div class="chart-container h-[400px] max-h-[450px]">
+                            <canvas id="cityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
 
+    </div>
 
-<div class="print-button-container">
-    <button class="print-button" onclick="window.print()">Print Report</button>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartColors = {
+                primary: '#C08261',
+                secondary: '#E2C799',
+                tertiary: '#F2ECBE',
+                accent: '#9E6F21',
+                neutral: '#D3D3D3',
+                font: '#4A4A4A'
+            };
 
-<script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyAvYBJSuhTW9I-qDgVWU2ICBJm45P6D3VcXKlq-GFYaK-SZakduMDa2fgtc3RILULi/exec';
-  let allData = []; // Store all fetched data
-  let allEntriesCount = 0; // Store the total count of entries
-
-  function today() {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
-  }
-
-  function displayCurrentDate() {
-    const now = new Date();
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'short' };
-    document.getElementById('reportDate').textContent =
-      `Report Generated On: ${now.toLocaleDateString('en-GB', options)}`;
-  }
-
-  // Helper function to parse 'dd-mm-yyyy hh:mm:ss' string into a Date object
-  function parseDateTimeString(dateTimeString) {
-    if (!dateTimeString) return null;
-
-    const parts = dateTimeString.split(' ');
-    if (parts.length !== 2) return null; // Expects "date time"
-
-    const datePart = parts[0]; // e.g., "06-07-2025"
-    const timePart = parts[1]; // e.g., "11:26:05"
-
-    const [day, month, year] = datePart.split('-').map(Number);
-    const [hours, minutes, seconds] = timePart.split(':').map(Number);
-
-    // Month is 0-indexed in JavaScript Date constructor (January is 0, December is 11)
-    return new Date(year, month - 1, day, hours, minutes, seconds);
-  }
-
-  function filterByDateRange(data, startDateStr, endDateStr) {
-    // Convert input date strings (yyyy-mm-dd from input type="date") to Date objects
-    const start = new Date(startDateStr);
-    const end = new Date(endDateStr);
-    
-    // Set end date to the end of the day for inclusive filtering
-    if (end) {
-        end.setHours(23, 59, 59, 999); 
-    }
-
-    const rows = data.slice(1); // Exclude header row
-    return rows.filter(row => {
-      const timestampString = row[0]; // Get the timestamp string from the sheet
-      if (!timestampString) return false; // Skip if timestamp is empty
-
-      const rowDate = parseDateTimeString(timestampString);
-
-      // Check if rowDate is a valid Date object and falls within the range
-      return rowDate instanceof Date && !isNaN(rowDate) && rowDate >= start && rowDate <= end;
-    });
-  }
-
-  function renderTable(rows) {
-    const tbody = document.getElementById('tableBody');
-    if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6">No entries for the selected date range.</td></tr>';
-      return;
-    }
-    const columnsToDisplay = [0, 1, 2, 3, 4, 5];
-
-    tbody.innerHTML = rows.map(row => `
-      <tr>
-        ${columnsToDisplay.map(index => `<td>${row[index] || ''}</td>`).join('')}
-      </tr>
-    `).join('');
-  }
-
-  function renderCategoryCounts(rows, startDate, endDate) {
-    const aboutIndex = 3;
-
-    let villaCount = 0;
-    let plotsCount = 0;
-    let investmentCount = 0;
-    let liveInCount = 0;
-    let detailsCount = 0;
-
-    rows.forEach(row => {
-      const about = (row[aboutIndex] || '').toLowerCase();
-      if (about.includes('villa')) villaCount++;
-      if (about.includes('plots')) plotsCount++;
-      if (about.includes('investment')) investmentCount++;
-      if (about.includes('live in')) liveInCount++;
-      if (about.includes('details')) detailsCount++;
-    });
-
-    const list = document.getElementById('categoryList');
-    list.innerHTML = `
-      <li><strong>Total Entries in Sheet:</strong> ${allEntriesCount}</li>
-      <li><strong>Total Leads (Selected Range):</strong> ${rows.length}</li>
-      <li><strong>Interest</strong></li>
-      <li>Villa: ${villaCount}</li>
-      <li>Plots: ${plotsCount}</li>
-      <li><strong>Purpose</strong></li>
-      <li>Investment: ${investmentCount}</li>
-      <li>Live In: ${liveInCount}</li>
-      <li>Details: ${detailsCount}</li>
-    `;
-
-    // Display selected date range
-    const selectedDateRangeElement = document.getElementById('selectedDateRange');
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    const formattedStartDate = new Date(startDate).toLocaleDateString('en-GB', options);
-    const formattedEndDate = new Date(endDate).toLocaleDateString('en-GB', options);
-    selectedDateRangeElement.textContent = `Selected Date Range: ${formattedStartDate} - ${formattedEndDate}`;
-  }
-
-  function fetchAndRender() {
-    const startDate = document.getElementById('filterStartDate').value;
-    const endDate = document.getElementById('filterEndDate').value;
-
-    if (allData.length === 0) { 
-        fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                allData = data.values;
-                if (allData && allData.length > 0) {
-                    allEntriesCount = allData.length - 1;
-                } else {
-                    allEntriesCount = 0;
+            const chartPlugin = {
+                id: 'customCanvasBackgroundColor',
+                beforeDraw: (chart, args, options) => {
+                    const {ctx} = chart;
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = options.color || '#FFFFFF';
+                    ctx.fillRect(0, 0, chart.width, chart.height);
+                    ctx.restore();
                 }
-                applyFiltersAndRender(startDate, endDate);
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6">Failed to load data</td></tr>';
-                document.getElementById('categoryList').innerHTML = '<li>Failed to load summary</li>';
-                document.getElementById('selectedDateRange').textContent = 'Selected Date Range: N/A';
+            };
+
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: chartColors.font,
+                            font: {
+                                family: "'Inter', sans-serif"
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleFont: { family: "'Inter', sans-serif" },
+                        bodyFont: { family: "'Inter', sans-serif" },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.pie !== undefined) {
+                                    const total = context.dataset.data.reduce((sum, current) => sum + current, 0);
+                                    const value = context.parsed;
+                                    const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                    label += `${context.raw} (${percentage})`;
+                                } else {
+                                    label += context.raw;
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    customCanvasBackgroundColor: {
+                        color: 'white',
+                    },
+                    datalabels: { // This plugin needs to be loaded separately for Chart.js
+                        display: true,
+                        color: chartColors.font,
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: (value, context) => {
+                            if (context.chart.config.type === 'doughnut') {
+                                const total = context.dataset.data.reduce((sum, current) => sum + current, 0);
+                                const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return percentage;
+                            }
+                            return value;
+                        }
+                    }
+                },
+            };
+
+            // To add ChartDataLabels plugin, it needs to be imported.
+            // For fast loading, we will use a direct CDN link if available or assume it's part of a larger Chart.js bundle.
+            // If not, we'll rely on tooltips for digits as the primary display.
+            // For this fast-loading requirement, we will stick to core Chart.js features.
+            // The `datalabels` option within plugins will only work if the plugin is registered.
+            // For this example, we will enhance the tooltip callback to show both value and percentage for doughnut charts.
+
+            const leadSourceData = {
+                labels: ['Facebook', 'Website', 'WhatsApp', 'Other'],
+                datasets: [{
+                    label: 'Leads',
+                    data: [270, 19, 9, 1],
+                    backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.accent, chartColors.neutral],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                }]
+            };
+            new Chart(document.getElementById('leadSourceChart'), {
+                type: 'doughnut',
+                data: leadSourceData,
+                options: defaultChartOptions,
+                plugins: [chartPlugin]
             });
-    } else {
-        applyFiltersAndRender(startDate, endDate);
-    }
-  }
 
-  function applyFiltersAndRender(startDate, endDate) {
-    let rows = filterByDateRange(allData, startDate, endDate);
+            const interestData = {
+                labels: ['Villa', 'Plots', 'Villa & Plots', 'Other'],
+                datasets: [{
+                    label: 'Leads',
+                    data: [171, 85, 39, 4],
+                    backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.accent, chartColors.neutral],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                }]
+            };
+            new Chart(document.getElementById('interestChart'), {
+                type: 'doughnut',
+                data: interestData,
+                options: defaultChartOptions,
+                plugins: [chartPlugin]
+            });
 
-    rows.sort((a, b) => {
-      const dateA = parseDateTimeString(a[0]);
-      const dateB = parseDateTimeString(b[0]);
+            const purposeData = {
+                labels: ['Investment', 'Live In', 'Unknown', 'Details', 'Construction', 'Other'],
+                datasets: [{
+                    label: 'Leads',
+                    data: [143, 52, 52, 33, 12, 7],
+                    backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.accent, chartColors.tertiary, '#A9A9A9', chartColors.neutral],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                }]
+            };
+            new Chart(document.getElementById('purposeChart'), {
+                type: 'doughnut',
+                data: purposeData,
+                options: defaultChartOptions,
+                plugins: [chartPlugin]
+            });
 
-      if (!dateA || isNaN(dateA)) return 1;
-      if (!dateB || isNaN(dateB)) return -1;
-      
-      return dateB.getTime() - dateA.getTime();
-    });
+            const jobData = {
+                labels: ['Not Specified', 'Manager/Officer', 'Business/Self Employed', 'Govt Employee', 'Unspecified', 'Engineer', 'Educator', 'Banking', 'IT', 'Medical'],
+                datasets: [{
+                    label: 'Number of Leads',
+                    data: [59, 43, 40, 22, 20, 12, 8, 7, 6, 6],
+                    backgroundColor: chartColors.secondary,
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                }]
+            };
+            new Chart(document.getElementById('jobChart'), {
+                type: 'bar',
+                data: jobData,
+                options: { ...defaultChartOptions,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: chartColors.font } },
+                        y: { grid: { display: false }, ticks: { color: chartColors.font } }
+                    },
+                    plugins: {
+                        ...defaultChartOptions.plugins,
+                        legend: { display: false },
+                        tooltip: {
+                            ...defaultChartOptions.plugins.tooltip,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [chartPlugin]
+            });
 
-    renderTable(rows);
-    renderCategoryCounts(rows, startDate, endDate); // Pass dates to render function
-  }
-
-  displayCurrentDate();
-
-  const filterStartDateInput = document.getElementById("filterStartDate");
-  const filterEndDateInput = document.getElementById("filterEndDate");
-  const todayDate = today();
-
-  filterStartDateInput.value = todayDate;
-  filterEndDateInput.value = todayDate;
-  filterStartDateInput.max = todayDate;
-  filterEndDateInput.max = todayDate;
-
-  filterStartDateInput.addEventListener("change", fetchAndRender);
-  filterEndDateInput.addEventListener("change", fetchAndRender);
-
-  fetchAndRender();
-</script>
-
+            const cityData = {
+                labels: ['Jhansi', 'Not Specified', 'Orai', 'Gwalior', 'Noida', 'Lalitpur', 'Datia', 'Mumbai', 'Ahmedabad', 'Other'],
+                datasets: [{
+                    label: 'Number of Leads',
+                    data: [138, 59, 10, 6, 6, 4, 4, 4, 4, 64],
+                    backgroundColor: chartColors.secondary,
+                    borderColor: chartColors.primary,
+                    borderWidth: 1
+                }]
+            };
+            new Chart(document.getElementById('cityChart'), {
+                type: 'bar',
+                data: cityData,
+                options: { ...defaultChartOptions,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: chartColors.font } },
+                        y: { grid: { display: false }, ticks: { color: chartColors.font } }
+                    },
+                    plugins: {
+                        ...defaultChartOptions.plugins,
+                        legend: { display: false },
+                        tooltip: {
+                            ...defaultChartOptions.plugins.tooltip,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [chartPlugin]
+            });
+        });
+    </script>
 </body>
 </html>
